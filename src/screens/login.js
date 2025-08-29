@@ -13,6 +13,7 @@ import Input from '../components/login/Input';
 import Button from '../components/login/Button';
 import { loginWithEmail } from '../services/authService';
 import { showErrorToast, showToast } from '../services/toast';
+import { setSession } from '../services/session';
 
 export default function Login() {
     const [passwordSecure, setPasswordSecure] = useState(true);
@@ -36,10 +37,18 @@ export default function Login() {
     };
 
     const onLogin = async () => {
+        // RootNavigation.navigate("main");
+
         if (!validate()) return;
         try {
             setLoading(true);
-            await loginWithEmail({ email: email.trim(), password: password.trim() });
+            const resp = await loginWithEmail({ email: email.trim(), password: password.trim() });
+            const token = resp?.access_token || resp?.token || resp?.accessToken || null;
+            // backend returns { status, access_token, token_type, expires_in, user, api_key }
+            const userPayload = resp?.user || {};
+            const apiKey = resp?.api_key;
+            const user = { ...userPayload, api_key: apiKey };
+            await setSession({ token, user });
             showToast('Logged in successfully');
             RootNavigation.navigate("main");
         } catch (err) {

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config/api';
+import { getToken, getUser } from './session';
 
 export class HttpClient {
     constructor(baseUrl = API_BASE_URL) {
@@ -12,8 +13,17 @@ export class HttpClient {
             'Content-Type': 'application/json',
             ...headers,
         };
-        console.log(body);
-        console.log(url);
+        const token = await getToken();
+        if (token && !finalHeaders['Authorization']) {
+            finalHeaders['Authorization'] = `Bearer ${token}`;
+        }
+        try {
+            const user = await getUser();
+            const apiKey = user?.api_key;
+            if (apiKey && !finalHeaders['X-API-KEY']) {
+                finalHeaders['X-API-KEY'] = apiKey;
+            }
+        } catch (_) {}
         console.log(finalHeaders);
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -25,6 +35,7 @@ export class HttpClient {
                 body: body ? JSON.stringify(body) : undefined,
                 signal: controller.signal,
             });
+            console.log(response);
         } catch (err) {
             console.log(err);
             
@@ -46,12 +57,13 @@ export class HttpClient {
             error.data = data;
             throw error;
         }
-        // console.log(data);
+        console.log(data);
         return data;
     }
 
     get(path, options) { return this.request(path, { method: 'GET', ...(options || {}) }); }
     post(path, body, options) { return this.request(path, { method: 'POST', body, ...(options || {}) }); }
+    put(path, body, options) { return this.request(path, { method: 'PUT', body, ...(options || {}) }); }
 }
 
 export const httpClient = new HttpClient();

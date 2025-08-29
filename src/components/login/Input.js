@@ -16,6 +16,7 @@ export default function Input(props) {
         endingAction = ()=>{},
         value,
         onChangeText,
+        ...restProps
     } = props;
 
     return <View style={styles.inputGroup}>
@@ -33,6 +34,7 @@ export default function Input(props) {
             style={[styles.inputField, endingIcon ? styles.inputEndingSpace:{}]}
             value={value}
             onChangeText={onChangeText}
+            {...restProps}
         />
         { !endingIcon ? null :
             <TouchableWithoutFeedback onPress={endingAction}>

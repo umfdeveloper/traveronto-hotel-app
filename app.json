@@ -1,7 +1,11 @@
 {
   "expo": {
-    "name": "MyFirstApp",
-    "slug": "MyFirstApp",
-    "version": "1.0.0"
+    "name": "Traveronto",
+    "slug": "traveronto",
+    "version": "1.0.1",
+    "splash": {
+      "image": "./assets/traveronto.png",
+      "backgroundColor": "#f0f0f0"
+    }
   }
 }
